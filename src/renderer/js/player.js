@@ -159,7 +159,7 @@ const Player = {
     this._loadMedia(media.url, startAt);
     this._setupSubtitles(entry.video.subtitles || []);
     App.showPlayer();
-    $("#player-overlay-title").textContent = entry.sub ? `${entry.title} — ${entry.sub}` : entry.title;
+    $("#player-overlay-title").textContent = this._currentTitle();
     this._flashTitle();
     $("#c-quality").textContent = (media.quality || "").replace("p", "ᴾ").length > 5
       ? "HD" : (media.quality || "HD");
@@ -320,6 +320,7 @@ const Player = {
 
   pause() {
     this.video.pause();
+    if (this.current) this._flashTitle(); // show the title, like on start
     this._sendMarktime(); // keep the server position fresh on pause
   },
 
@@ -367,6 +368,12 @@ const Player = {
     osd.classList.remove("hidden");
     clearTimeout(this._osdTimer);
     this._osdTimer = setTimeout(() => osd.classList.add("hidden"), 1600);
+  },
+
+  _currentTitle() {
+    const c = this.current;
+    if (!c) return "";
+    return c.sub ? `${c.title} — ${c.sub}` : c.title;
   },
 
   _flashTitle() {
@@ -443,7 +450,9 @@ const Player = {
       sm.textContent = "";
       return;
     }
-    st.textContent = this.video.paused ? "Пауза" : "Воспроизведение";
+    st.textContent = this.video.paused
+      ? `Пауза — ${this._currentTitle()}`
+      : "Воспроизведение";
     const kind = this.current.kind === "tv" ? "ТВ" :
       API.settings.stream_type.toUpperCase();
     sm.textContent = `${this.currentQuality || ""} ${kind}`.trim();

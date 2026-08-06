@@ -13,6 +13,8 @@ const DEFAULTS = {
   stream_type: "hls4", // hls | hls2 | hls4
   loc: "ru", // CDN location: ru | nl
   ask_quality: false,
+  // network: route all traffic through the OS proxy settings (Chromium stack)
+  use_system_proxy: true,
   // listing
   sort_by: "rating", // updated|created|year|title|rating|kinopoisk_rating|imdb_rating|views|watchers
   sort_direction: "desc", // asc | desc

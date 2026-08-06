@@ -364,6 +364,7 @@ const App = {
     const sortDir = mkSelect(
       [{ value: "desc", label: "По убыванию" }, { value: "asc", label: "По возрастанию" }],
       s.sort_direction);
+    const useProxy = mkCheck(s.use_system_proxy);
     const exclAnime = mkCheck(s.exclude_anime);
     const markAdvert = mkCheck(s.mark_advert);
     const histQty = mkSelect(["10", "15", "20"], String(s.history_max_qty));
@@ -386,6 +387,8 @@ const App = {
       el("label", { text: "Тип потока" }), stream,
       el("label", { text: "Расположение CDN" }), loc,
       el("label", { text: "Спрашивать качество перед стартом" }), askQ,
+      el("div", { class: "settings-section", text: "Сеть" }),
+      el("label", { text: "Использовать системный прокси" }), useProxy,
       el("div", { class: "settings-section", text: "Списки" }),
       el("label", { text: "Сортировка" }), sortBy,
       el("label", { text: "Направление" }), sortDir,
@@ -412,6 +415,7 @@ const App = {
       stream_type: stream.value,
       loc: loc.value,
       ask_quality: askQ.checked,
+      use_system_proxy: useProxy.checked,
       sort_by: sortBy.value,
       sort_direction: sortDir.value,
       exclude_anime: exclAnime.checked,

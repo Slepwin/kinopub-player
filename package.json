@@ -1,6 +1,6 @@
 {
   "name": "kinopub-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Kino.pub player in Media Player Classic style",
   "main": "src/main/main.js",
   "author": "slepwin <slepwinvg@gmail.com>",
@@ -27,8 +27,7 @@
       "target": [
         { "target": "nsis", "arch": ["x64"] },
         { "target": "zip", "arch": ["x64"] }
-      ],
-      "signAndEditExecutable": false
+      ]
     },
     "nsis": {
       "oneClick": false,

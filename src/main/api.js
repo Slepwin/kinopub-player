@@ -1,6 +1,7 @@
 "use strict";
 
 const os = require("os");
+const { net } = require("electron");
 
 // Same OAuth application as the Kodi add-on (kodi.kino.pub).
 const CLIENT_ID = "xbmc";
@@ -47,10 +48,16 @@ class KinoPubApi {
     return Boolean(this.store.get("access_token"));
   }
 
+  // Node's fetch ignores OS proxy settings; Electron's net.fetch goes through
+  // the Chromium network stack, which resolves the system proxy.
+  _fetch(url, opts) {
+    return this.store.get("use_system_proxy") ? net.fetch(url, opts) : fetch(url, opts);
+  }
+
   // ---------------------------------------------------------------- OAuth ---
 
   async _oauthRequest(payload, url) {
-    const res = await fetch(url, {
+    const res = await this._fetch(url, {
       method: "POST",
       headers: {
         "content-type": "application/x-www-form-urlencoded",
@@ -230,7 +237,7 @@ class KinoPubApi {
 
     let res;
     try {
-      res = await fetch(url, opts);
+      res = await this._fetch(url, opts);
     } catch (e) {
       throw new ApiError("kino.pub не отвечает", 0, { cause: String(e) });
     }

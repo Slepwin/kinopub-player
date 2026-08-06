@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, shell, session } = require("electron");
+const { app, BrowserWindow, ipcMain, shell, session, net } = require("electron");
 const path = require("path");
 const { Store } = require("./store");
 const { KinoPubApi } = require("./api");
@@ -11,6 +11,13 @@ let api = null;
 
 function emitToRenderer(channel, payload) {
   if (win && !win.isDestroyed()) win.webContents.send(channel, payload);
+}
+
+// "system" follows the OS proxy settings; "direct" forces direct connections.
+function applyProxyMode() {
+  session.defaultSession.setProxy({
+    mode: store.get("use_system_proxy") ? "system" : "direct",
+  });
 }
 
 function createWindow() {
@@ -64,7 +71,11 @@ function registerIpc() {
   ipcMain.handle("auth:reset", () => api.resetAuth());
 
   ipcMain.handle("settings:get", () => store.get());
-  ipcMain.handle("settings:set", (e, patch) => store.set(patch));
+  ipcMain.handle("settings:set", (e, patch) => {
+    const result = store.set(patch);
+    if ("use_system_proxy" in patch) applyProxyMode();
+    return result;
+  });
 
   ipcMain.handle("history:add", (e, title) => store.addSearchHistory(title));
   ipcMain.handle("history:clear", () => store.clearSearchHistory());
@@ -80,7 +91,8 @@ function registerIpc() {
   // Fetches a subtitle file (srt) and returns its text — done in the main
   // process to avoid renderer mixed-content/charset issues.
   ipcMain.handle("subtitles:fetch", async (e, url) => {
-    const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
+    const doFetch = store.get("use_system_proxy") ? net.fetch : fetch;
+    const res = await doFetch(url, { signal: AbortSignal.timeout(30000) });
     if (!res.ok) throw new Error(`subtitles HTTP ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
     // kino.pub subtitles are UTF-8
@@ -100,6 +112,7 @@ app.whenReady().then(() => {
     cb({ requestHeaders: details.requestHeaders });
   });
 
+  applyProxyMode();
   registerIpc();
   createWindow();
 
