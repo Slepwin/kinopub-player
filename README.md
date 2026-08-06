@@ -113,6 +113,24 @@ npm run dist:arch    # только Arch Linux
 Для pacman-цели нужен `bsdtar` (`sudo apt install libarchive-tools` на
 Ubuntu; на Arch входит в базовый `libarchive`).
 
+## Автоматические релизы (GitHub Actions)
+
+Workflow `.github/workflows/build.yml` собирает приложение под Windows, macOS
+и Linux. Запуск:
+
+- **пуш тега `v*`** — сборка на всех трёх ОС и публикация GitHub Release
+  со всеми артефактами:
+
+  ```bash
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+
+- **вручную** — вкладка Actions → Build → Run workflow; артефакты будут
+  доступны в результатах запуска без создания релиза.
+
+На Windows-раннере NSIS-инсталлятор собирается нативно (wine не нужен).
+
 ## Структура
 
 ```
