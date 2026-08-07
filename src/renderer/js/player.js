@@ -316,6 +316,7 @@ const Player = {
   play() {
     if (!this.current) return;
     this.video.play().catch(() => {});
+    this._flashTitle(); // show the title, like on start
   },
 
   pause() {
@@ -450,9 +451,7 @@ const Player = {
       sm.textContent = "";
       return;
     }
-    st.textContent = this.video.paused
-      ? `Пауза — ${this._currentTitle()}`
-      : "Воспроизведение";
+    st.textContent = `${this.video.paused ? "Пауза" : "Воспроизведение"} — ${this._currentTitle()}`;
     const kind = this.current.kind === "tv" ? "ТВ" :
       API.settings.stream_type.toUpperCase();
     sm.textContent = `${this.currentQuality || ""} ${kind}`.trim();

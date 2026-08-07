@@ -371,11 +371,14 @@ const Views = {
       item.rating_votes ? el("span", { text: `Голосов: ${item.rating_votes}` }) : null,
     ]);
 
+    // item.duration is an object {average, total} in detail responses
+    const duration = item.duration?.average ?? item.duration;
+
     const head = el("div", { class: "detail" }, [
       el("div", { class: "poster-col" }, [el("img", { src: posters.big || posters.medium || "" })]),
       el("div", { class: "info-col" }, [
         el("h1", { text: item.title }),
-        el("div", { class: "meta", text: [item.year, item.duration ? fmtTime(item.duration) : null].filter(Boolean).join(" · ") }),
+        el("div", { class: "meta", text: [item.year, duration ? fmtTime(duration) : null].filter(Boolean).join(" · ") }),
         ratings,
         el("div", { class: "plot", text: item.plot || "" }),
         fields,
